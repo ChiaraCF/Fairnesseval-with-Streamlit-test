@@ -1,0 +1,3 @@
+experiment_id,dataset_name,model_code,train_error,test_error,train_EqualizedOdds,test_DemographicParity,time
+demo.default.test,adult,LogisticRegression,0.2,0.25,0.1,0.15,12
+demo.D.0r,compas,expgard,0.22,0.27,0.12,0.14,10

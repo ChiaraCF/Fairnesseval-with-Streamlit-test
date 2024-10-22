@@ -6,6 +6,8 @@ from fairnesseval import utils_results_data
 from fairnesseval.graphic.graphic_utility import plot_demo_subplots
 
 
+
+
 def plot_function_B(chart_name, experiment_code_list, model_list, x_axis, y_axis_list, grouping_col=None,
                     res_path='./demo_results', save=True, show=False, single_plot=True, dataset_list=None):
     dataset_results_path = os.path.join(res_path)

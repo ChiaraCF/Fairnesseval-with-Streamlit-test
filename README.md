@@ -1,4 +1,4 @@
-# Fairness Evaluation and Testing Repository
+# Fairness Evaluation and Testing Repository with Streamlit UI
 
 Automated decision-making systems can potentially introduce biases, raising ethical concerns. This has led to the
 development of numerous bias mitigation techniques.
@@ -13,35 +13,12 @@ In this demonstration, we highlight the functionality of FairnessEval in the sel
 We compare various approaches and simulate deployment scenarios to showcase FairnessEval effectiveness.
 
 
-## fairnesseval DEMO
-[Here](https://github.com/softlab-unimore/fairnesseval/blob/main/notebooks/DEMO%20fairnesseval.ipynb)
-you can find a demo notebook with working examples.
-
-You can interact with the notebook and run the library with your experiments.
-
-## fairnesseval API Quick Start
-
-[Here](https://github.com/softlab-unimore/fairnesseval/blob/main/notebooks/fairnesseval%20Quick%20Start.ipynb)
-you can find a quick start guide to the fairnesseval API with working examples.
+# How to use
+Download the project from GitHub and open it in the development enviroment you prefer.
+open the terminal and write:
+"cd src/fairnesseval/graphic"
+Now write:
+"run streamlit page_welcome.py"
+A page on your local host should be opened: you can start to use Fairnesseval.
 
 
-## Experiment parameters
-
-| Parameter | Description                                                                                                                                                                                                                                                                          |
-| --- |---|
-| `experiment_id` | ID of the experiment to run. Required.                                                                                                                                                                                                                                               |
-| `dataset_name` | List of dataset names. Required.                                                                                                                                                                                                                                                     |
-| `model_name` | List of model names. Required.                                                                                                                                                                                                                                                                |
-| `results_path RESULTS_PATH` | Path to save results.                                                                                                                                                                                                                                                                |
-| `train_fractions` | List of fractions to be used for training.                                                                                                                                                                                                                                           |
-| `random_seeds` | List of random seeds to use. All random seeds set are related to this random seed. For each random_seed a new train_test split is done.                                                                                                                                              |
-| `metrics` | Metric set to be used for evaluation. Available metric set names are `default`, `conversion_to_binary_sensitive_attribute`. To use custom metrics add a new key to `metrics_code_map` in `fairnesseval.metrics.py`.                                                                  |
-| `preprocessing` | Preprocessing function to be used. Available preprocessing functions are `conversion_to_binary_sensitive_attribute`, `binary_split_by_mean_y`, `default`. To add a new preprocessing function add a new key to `preprocessing_function_map` in `fairnesseval.utils_prepare_data.py`. |
-| `split_strategy` | Splitting strategy. Available split strategies are `stratified_train_test_split`, `StratifiedKFold`.                                                                                                                                                                                 |
-| `train_test_fold` | List of `train_test_fold` to run with k-fold.                                                                                                                                                                                                                                        |
-| `model_params` | Dict with key, value pairs of model hyper parameter names (key) and list of values to be iterated (values). When multiple list of parameters are specified the cross product is used to generate all the combinations to test.                                                       |
-| `debug` | Debug mode if set, the program will stop at the first exception.                                                                                                                                                                                                                     |
-
-This table provides a clear and concise overview of the parameters and their descriptions.
-
-[//]: # (TODO define synthetic generations. explain how to use it. Automatically find and load it.)
