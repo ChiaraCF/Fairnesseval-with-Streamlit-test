@@ -15,4 +15,4 @@ cvxpy>=1.4.2
 dccp
 ipywidgets
 fair-classification @ git+https://github.com/baraldian/fair-classification-python3@master
-streamlit>=1.26.0
+streamlit>=1.12.0
