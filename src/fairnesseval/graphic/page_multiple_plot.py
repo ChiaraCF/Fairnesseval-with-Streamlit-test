@@ -64,11 +64,11 @@ def pagina3():
 
             # Select attribute for  X  Y
             columns = results_df.columns.tolist()
-            x_axis = st.selectbox('X-Attributes', columns)
-            y_axis = st.multiselect('Y-Attributes', columns)
+            x_axis = st.selectbox('X-Attributes', sorted(columns))
+            y_axis = st.multiselect('Y-Attributes', sorted(columns))
 
             # Select attribute to group (optional)
-            grouping_col = st.selectbox('Grouping attributes (Optional)', [None] + columns)
+            grouping_col = st.selectbox('Grouping attributes (Optional)', [None] + sorted(columns))
 
             # Botton to generate graphic
             if st.button('Generate graphic'):

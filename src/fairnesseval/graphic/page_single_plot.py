@@ -68,15 +68,15 @@ def pagina2():
 
             # Select attributes for axis X and Y
             columns = results_df.columns.tolist()
-            x_axis = st.selectbox('X-Attributes', columns)
-            y_axis = st.selectbox('Y-Attributes', columns)
+            x_axis = st.selectbox('X-Attributes', sorted(columns))
+            y_axis = st.selectbox('Y-Attributes', sorted(columns))
 
             # Select dataset
             datasets = results_df['dataset_name'].unique().tolist()
             selected_dataset = st.selectbox('Select Dataset', datasets)
 
             # Seelect grouping attribute (optionale)
-            grouping_col = st.selectbox('Grouping attribute (Optional)', [None] + columns)
+            grouping_col = st.selectbox('Grouping attribute (Optional)', [None] + sorted(columns))
 
             # Button to generate graphic
             if st.button('Generate graphic'):

@@ -44,7 +44,7 @@ def pagina1():
     all_datasets = exp_params.ACS_dataset_names + ['adult', 'compas', 'german']
     model_list = [
         'LogisticRegression',
-        'expgrad',
+        'Expgrad',
         'ThresholdOptimizer',
         'ZafarDI',
         'ZafarEO',
@@ -52,7 +52,15 @@ def pagina1():
     ]
 
     # Function to safely evaluate inputs
+  ##  def eval_none(x):
+    #    try:
+     #       return eval(x)
+      #  except Exception as e:
+       #     logger.error(f"Error evaluating input {x}: {str(e)}")
+        #    return None
     def eval_none(x):
+        if not x.strip():
+            return None
         try:
             return eval(x)
         except Exception as e:
@@ -64,22 +72,32 @@ def pagina1():
 
     # Dataset selection
     #st.markdown("**Dataset Selection**")
-    selected_datasets = st.multiselect('Datasets', all_datasets, default=[all_datasets[-3]])
+    #selected_datasets = st.multiselect('Datasets', all_datasets, default=[all_datasets[-3]])
+    selected_datasets = st.multiselect(
+        'Datasets',
+        sorted(all_datasets),
+        default=[sorted(all_datasets)[-3]]
+    )
 
     # Model selection
     #st.markdown("**Model Selection**")
-    selected_models = st.multiselect('Models', model_list, default=[model_list[0]])
+    #selected_models = st.multiselect('Models', model_list, default=[model_list[0]])
+    selected_models = st.multiselect(
+        'Models',
+        sorted(model_list),
+        default=[sorted(model_list)[2]]
+    )
 
     # Model parameters input
     #st.markdown("**Model Parameters**")
-    model_parameters = st.text_area('Enter parameters as key-value pairs (e.g., {"param1": value1, "param2": value2}) (Optional)', '')
+    model_parameters = st.text_input('Model parameters: enter parameters as key-value pairs (e.g., {"param1": value1, "param2": value2}). These values will be used as parameters of the model. (Optional)', '')
 
     # Train fractions input
     #st.markdown("**Training Fractions**")
-    train_fractions = st.text_area('Enter training fractions (e.g., [0.016, 0.063, 0.251, 1.]) (Optional)', '')
+    train_fractions = st.text_input('Train fractions: enter training fractions (e.g., [0.016, 0.063, 0.251, 1.]) (Optional)', '')
 
     # Random seed input
-    random_seed = st.number_input('Random Seed', value=42)
+    random_seed = st.text_input('Random Seed: enter a value or a list of values (e.g. [41,42,23])', '')
 
     # Button to run the experiment
     if st.button('Run Experiment'):
@@ -94,7 +112,7 @@ def pagina1():
             'experiment_id': 'demo.default.test',
             'dataset_names': selected_datasets,
             'model_names': selected_models,
-            'random_seeds': [random_seed],
+            'random_seed': eval_none(random_seed),
             'model_params': eval_none(model_parameters),
             'train_fractions': eval_none(train_fractions),
             'results_path': './demo_results',
