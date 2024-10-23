@@ -2,6 +2,8 @@ import streamlit as st
 import logging
 import time
 import io
+import time
+import os
 from fairnesseval import utils_experiment_parameters as exp_params
 from fairnesseval.run import launch_experiment_by_config
 from datetime import datetime
@@ -51,13 +53,6 @@ def pagina1():
         'Feld'
     ]
 
-    # Function to safely evaluate inputs
-  ##  def eval_none(x):
-    #    try:
-     #       return eval(x)
-      #  except Exception as e:
-       #     logger.error(f"Error evaluating input {x}: {str(e)}")
-        #    return None
     def eval_none(x):
         if not x.strip():
             return None
@@ -71,8 +66,6 @@ def pagina1():
     st.title("Experiment definition and execution")
 
     # Dataset selection
-    #st.markdown("**Dataset Selection**")
-    #selected_datasets = st.multiselect('Datasets', all_datasets, default=[all_datasets[-3]])
     selected_datasets = st.multiselect(
         'Datasets',
         sorted(all_datasets),
@@ -80,8 +73,6 @@ def pagina1():
     )
 
     # Model selection
-    #st.markdown("**Model Selection**")
-    #selected_models = st.multiselect('Models', model_list, default=[model_list[0]])
     selected_models = st.multiselect(
         'Models',
         sorted(model_list),
@@ -89,64 +80,72 @@ def pagina1():
     )
 
     # Model parameters input
-    #st.markdown("**Model Parameters**")
-    model_parameters = st.text_input('Model parameters: enter parameters as key-value pairs (e.g., {"param1": value1, "param2": value2}). These values will be used as parameters of the model. (Optional)', '')
+    model_parameters = st.text_area('Model parameters: enter parameters as key-value pairs (e.g., {"param1": value1, "param2": value2}). These values will be used as parameters of the model. (Optional)', '')
 
     # Train fractions input
-    #st.markdown("**Training Fractions**")
     train_fractions = st.text_input('Train fractions: enter training fractions (e.g., [0.016, 0.063, 0.251, 1.]) (Optional)', '')
 
     # Random seed input
-    random_seed = st.text_input('Random Seed: enter a value or a list of values (e.g. [41,42,23])', '')
+    random_seed = st.text_input('Random Seed: enter a value or a list of values (e.g. [41,42,23]) (Required)', '')
+
+    # Experiment ID
+    experimentID = st.text_input('Experiment ID: enter the name of the experiment (Required)', '')
 
     # Button to run the experiment
     if st.button('Run Experiment'):
-        # Create an empty area to display logs below the button
-        log_area = st.empty()
+        # Check if experiment ID exists in the demo_results folder
+        results_path = './demo_results'
+        experiment_path = os.path.join(results_path, experimentID)
 
-        # Configure loggers for Streamlit
-        logger = setup_logging(log_area)
+        if os.path.exists(experiment_path):
+            st.warning(f"Experiment ID '{experimentID}' already exists. Please choose a different name.")
+        else:
+            # Create an empty area to display logs below the button
+            log_area = st.empty()
 
-        # Experiment configuration
-        experiment_conf = {
-            'experiment_id': 'demo.default.test',
-            'dataset_names': selected_datasets,
-            'model_names': selected_models,
-            'random_seed': eval_none(random_seed),
-            'model_params': eval_none(model_parameters),
-            'train_fractions': eval_none(train_fractions),
-            'results_path': './demo_results',
-            'params': ['--debug']  # Placeholder for other parameters
-        }
+            # Configure loggers for Streamlit
+            logger = setup_logging(log_area)
 
-        # Log the configuration before cleaning it up (formatted with new lines)
-        logger.info("Experiment configuration before cleanup (raw):")
-        for key, value in experiment_conf.items():
-            logger.info(f"{key}: {value}")
+            # Experiment configuration
+            experiment_conf = {
+                'experiment_id': experimentID,
+                'dataset_names': selected_datasets,
+                'model_names': selected_models,
+                'random_seed': eval_none(random_seed),
+                'model_params': eval_none(model_parameters),
+                'train_fractions': eval_none(train_fractions),
+                'results_path': results_path,
+                'params': ['--debug']  # Placeholder for other parameters
+            }
 
-        # Remove empty values from the configuration
-        experiment_conf = {k: v for k, v in experiment_conf.items() if v}
+            # Log the configuration before cleaning it up (formatted with new lines)
+            logger.info("Experiment configuration before cleanup (raw):")
+            for key, value in experiment_conf.items():
+                logger.info(f"{key}: {value}")
 
-        # Log the final cleaned-up configuration (formatted with new lines)
-        logger.info("Final experiment configuration (after cleanup):")
-        for key, value in experiment_conf.items():
-            logger.info(f"{key}: {value}")
+            # Remove empty values from the configuration
+            experiment_conf = {k: v for k, v in experiment_conf.items() if v}
 
-        # Attempt to run the experiment
-        try:
-            logger.info("Starting experiment...")
+            # Log the final cleaned-up configuration (formatted with new lines)
+            logger.info("Final experiment configuration (after cleanup):")
+            for key, value in experiment_conf.items():
+                logger.info(f"{key}: {value}")
 
-            # Simulate logging during the experiment
-            for i in range(5):
-                time.sleep(1)  # Simulate the execution time of the experiment
-                logger.info(f"Running... Step {i + 1}/5")
+            # Attempt to run the experiment
+            try:
+                logger.info("Starting experiment...")
 
-            # Execute the experiment
-            launch_experiment_by_config(experiment_conf)
+                # Simulate logging during the experiment
+                for i in range(5):
+                    time.sleep(1)  # Simulate the execution time of the experiment
+                    logger.info(f"Running... Step {i + 1}/5")
 
-            logger.info("Experiment successfully completed!")
-        except Exception as e:
-            logger.error(f"Error during experiment execution: {str(e)}")
+                # Execute the experiment
+                launch_experiment_by_config(experiment_conf)
+
+                logger.info("Experiment successfully completed!")
+            except Exception as e:
+                logger.error(f"Error during experiment execution: {str(e)}")
 
 # Run the function pagina1
 #pagina1()
