@@ -1,45 +1,9 @@
 import streamlit as st
 import logging
-import time
-import io
-import time
 import os
 from fairnesseval import utils_experiment_parameters as exp_params
 from fairnesseval.run import launch_experiment_by_config
-from datetime import datetime
-
-# Create a handler to write logs to a buffer
-class StreamlitLogger(io.StringIO):
-    def __init__(self, log_area):
-        super().__init__()
-        self.log_area = log_area  # Area where logs will be displayed
-        self.log_data = ""  # String to accumulate log messages
-
-    def write(self, message):
-        # Filter out any empty messages
-        if message.strip():
-            # Accumulate logs and update log area
-            self.log_data += message + "\n"
-            self.log_area.markdown(f"```\n{self.log_data}\n```")  # Update log display
-
-# Configure the logger to use the Streamlit buffer
-def setup_logging(log_area):
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
-    # Streamlit handler
-    streamlit_handler = logging.StreamHandler(StreamlitLogger(log_area))
-    streamlit_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    streamlit_handler.setFormatter(formatter)
-
-    # Clear previous handlers and add the new one
-    if logger.hasHandlers():
-        logger.handlers.clear()
-    logger.addHandler(streamlit_handler)
-
-    return logger
-
+from redirect import stdout, stderr
 
 def pagina1():
     # List of datasets and models
@@ -83,7 +47,7 @@ def pagina1():
     model_parameters = st.text_area('Model parameters: enter parameters as key-value pairs (e.g., {"param1": value1, "param2": value2}). These values will be used as parameters of the model. (Optional)', '')
 
     # Train fractions input
-    train_fractions = st.text_input('Train fractions: enter training fractions (e.g., [0.016, 0.063, 0.251, 1.]) (Optional)', '')
+    train_fractions = st.text_input('Train fractions: enter training fractions (e.g., [0.016, 0.063, 0.251, 1]). (Optional)', '')
 
     # Random seed input
     random_seed = st.text_input('Random Seed: enter a value or a list of values (e.g. [41,42,23]) (Required)', '')
@@ -103,49 +67,51 @@ def pagina1():
             # Create an empty area to display logs below the button
             log_area = st.empty()
 
-            # Configure loggers for Streamlit
-            logger = setup_logging(log_area)
+            # Set up the logger to use the stdout redirection for Streamlit
+            logger = logging.getLogger()
+            logger.setLevel(logging.INFO)
 
-            # Experiment configuration
-            experiment_conf = {
-                'experiment_id': experimentID,
-                'dataset_names': selected_datasets,
-                'model_names': selected_models,
-                'random_seed': eval_none(random_seed),
-                'model_params': eval_none(model_parameters),
-                'train_fractions': eval_none(train_fractions),
-                'results_path': results_path,
-                'params': ['--debug']  # Placeholder for other parameters
-            }
+            # Clear any existing handlers
+            if logger.hasHandlers():
+                logger.handlers.clear()
 
-            # Log the configuration before cleaning it up (formatted with new lines)
-            logger.info("Experiment configuration before cleanup (raw):")
-            for key, value in experiment_conf.items():
-                logger.info(f"{key}: {value}")
+            # Use the redirect class to capture stdout logs in the Streamlit log area
+            with stdout(to=log_area, format='code', max_buffer=5000, buffer_separator='\n'):
+                # Experiment configuration
+                experiment_conf = {
+                    'experiment_id': experimentID,
+                    'dataset_names': selected_datasets,
+                    'model_names': selected_models,
+                    'random_seed': eval_none(random_seed),
+                    'model_params': eval_none(model_parameters),
+                    'train_fractions': eval_none(train_fractions),
+                    'results_path': results_path,
+                    'params': ['--debug']  # Placeholder for other parameters
+                }
 
-            # Remove empty values from the configuration
-            experiment_conf = {k: v for k, v in experiment_conf.items() if v}
+                # Log the configuration before cleaning it up (formatted with new lines)
+                logger.info("Experiment configuration before cleanup (raw):")
+                for key, value in experiment_conf.items():
+                    logger.info(f"{key}: {value}")
 
-            # Log the final cleaned-up configuration (formatted with new lines)
-            logger.info("Final experiment configuration (after cleanup):")
-            for key, value in experiment_conf.items():
-                logger.info(f"{key}: {value}")
+                # Remove empty values from the configuration
+                experiment_conf = {k: v for k, v in experiment_conf.items() if v}
 
-            # Attempt to run the experiment
-            try:
-                logger.info("Starting experiment...")
+                # Log the final cleaned-up configuration (formatted with new lines)
+                logger.info("Final experiment configuration (after cleanup):")
+                for key, value in experiment_conf.items():
+                    logger.info(f"{key}: {value}")
 
-                # Simulate logging during the experiment
-                for i in range(5):
-                    time.sleep(1)  # Simulate the execution time of the experiment
-                    logger.info(f"Running... Step {i + 1}/5")
+                # Attempt to run the experiment
+                try:
+                    logger.info("Starting experiment...")
 
-                # Execute the experiment
-                launch_experiment_by_config(experiment_conf)
+                    # Execute the experiment
+                    launch_experiment_by_config(experiment_conf)
 
-                logger.info("Experiment successfully completed!")
-            except Exception as e:
-                logger.error(f"Error during experiment execution: {str(e)}")
+                    logger.info("Experiment successfully completed!")
+                except Exception as e:
+                    logger.error(f"Error during experiment execution: {str(e)}")
 
 # Run the function pagina1
 #pagina1()
